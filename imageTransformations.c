@@ -22,7 +22,7 @@ void changeContrast( Image* im , float param ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
 			int currentValue = im->luts[c][k] ;
-			int nextValue = currentValue + sin( currentValue*2*PI/256 - PI )*param ;
+			int nextValue = currentValue + sin( currentValue*2*PI/255 - PI )*param ;
 			im->luts[c][k] = nextValue ;
 		}
 	}
