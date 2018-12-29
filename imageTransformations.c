@@ -37,6 +37,7 @@ void invertColours( Image* im ){
 }
 
 //Decreases the values of the color channel, with strongest effect on intermediate values and no effect on pure black and pure white.
+//I would suggest you go there to see the curve and play around with the coefficients : https://www.geogebra.org/classic/yfggz7nu
 //See the report for more details on the chosen function.
 void cubicMitigateColourChannel( Image* im , int colour , float coefXcube , float coefX ){
 	for( int k = 0 ; k < 256 ; ++k ){
