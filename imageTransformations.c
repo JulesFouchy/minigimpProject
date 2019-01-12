@@ -97,3 +97,15 @@ void changeSaturation( Image* im , float percentage ){
     	}
     }
 }
+
+// dir is either 1 or -1 and indicates if the right part is copied onto the left one (1) or vice-versa (-1)
+void verticalMirror( Image* im , int dir ){
+	for( int i = 0 ; i < im->height ; ++i ){
+		for( int j = 0 ; j < im->width/2 ; ++j ){
+			int actualJ = j*dir + (im->width-1)*(1-dir)/2 ; // either j or width-1-j depending on the value of dir
+			for( int c = 0 ; c < 3 ; ++c ){
+				setPixel( im , i , actualJ , c , getPixel( im , i , im->width-1-actualJ , c ) ) ;
+			}
+		}
+	}
+}

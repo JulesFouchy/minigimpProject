@@ -61,6 +61,14 @@ int main( int argc , char* argv[] ){
 		else if( strcmp( argv[k] , "SAT" ) == 0 ){
 			changeSaturation( im , atof(argv[++k]) ) ;
 		}
+		else if( strcmp( argv[k] , "MIRROR" ) == 0 ){
+			if( strcmp( argv[++k] , "RIGHT" ) == 0 ){
+				verticalMirror( im , 1 ) ;
+			}
+			else{
+				verticalMirror( im , -1 ) ;
+			}
+		}
 	}
 
 	saveImagePPM( "result.ppm" , im ) ;

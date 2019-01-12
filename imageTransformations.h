@@ -20,3 +20,5 @@ void brightenTheWhites( Image* im , float power , float factor ) ;
 void convertToGrayScale( Image* im ) ;
 
 void changeSaturation( Image* im , float percentage ) ;
+
+void verticalMirror( Image* im , int dir ) ;
