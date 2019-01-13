@@ -69,8 +69,23 @@ int main( int argc , char* argv[] ){
 				verticalMirror( im , -1 ) ;
 			}
 		}
+		else if( strcmp( argv[k] , "VIG" ) == 0 ){
+			vignetting( im , 10 , 7 ) ;
+		}
+		else if( strcmp( argv[k] , "BLUR" ) == 0 ){
+			int kernelSize = atoi(argv[++k]) ;
+			if( kernelSize%2 == 0){
+				printf("%s\n", "error : BLUR's argument must be an odd integer." );
+				return EXIT_FAILURE ;
+			}
+			float x = 1.0/kernelSize/kernelSize ;
+			float kernel[kernelSize*kernelSize] ;
+			for( int l = 0 ; l < kernelSize*kernelSize ; ++l ){
+				kernel[l] = x ;
+			}
+			applyConvolution( &im , kernel , kernelSize ) ;
+		}
 	}
-
 	saveImagePPM( "result.ppm" , im ) ;
 
 	free(im) ;

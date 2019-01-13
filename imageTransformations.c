@@ -3,6 +3,8 @@
 	#include "imageTransformations.h"
 #endif
 
+#include <stdlib.h>
+
 #include <math.h>
 #define PI 3.141592653589793238462643
 
@@ -108,4 +110,47 @@ void verticalMirror( Image* im , int dir ){
 			}
 		}
 	}
+}
+
+void vignetting( Image* im , float horizontalRadius , float verticalRadius ){
+	for( int i = 0 ; i < im->height ; ++i ){
+    	for( int j = 0 ; j < im->width ; ++j ) {
+    		int dist = (int)sqrt( pow((j-im->width/2)/horizontalRadius,2) + pow((i-im->height/2)/verticalRadius,2) ) ;
+    		for( int c = 0 ; c < 3 ; ++c ){
+    			setPixel( im , i , j , c , toUnsignedChar(getPixel(im,i,j,c)-dist) ) ;
+    		}
+    	}
+    }
+}
+
+void applyConvolution( Image** im , float kernel[] , int kernelSize ){
+	//Create the new image
+	Image* newImPtr = malloc(sizeof(Image) + ((*im)->width)*((*im)->height)*3*sizeof(unsigned char)) ;
+	newImPtr->width = (*im)->width ;
+	newImPtr->height = (*im)->height ;
+	for( int k = 0 ; k < 256 ; ++k ){
+		for( int c = 0 ; c < 3 ; ++c ){
+			newImPtr->luts[c][k] = (*im)->luts[c][k] ;
+		}
+	}
+	//Loop over the pixels
+	for( int i = 0 ; i < (*im)->height ; ++i ){
+    	for( int j = 0 ; j < (*im)->width ; ++j ) {
+    		for( int c = 0 ; c < 3 ; ++c ){
+    			//Loop over the neighbours of the pixel
+    			float newValue = 0 ;
+    			for( int i_ = 0 ; i_ < kernelSize ; ++i_ ){
+    				for( int j_ = 0 ; j_ < kernelSize ; ++j_ ){
+    					int neighbourI =  i + i_ - kernelSize/2 ;
+    					int neighbourJ =  j + j_ - kernelSize/2 ;
+    					if( neighbourI >= 0 && neighbourI < (*im)->height && neighbourJ >= 0 && neighbourJ < (*im)->width ){
+    						newValue += kernel[j_+i_*kernelSize]*getPixel( *im , neighbourI , neighbourJ , c ) ;
+    					}
+    				}
+    			}
+    			setPixel( newImPtr , i , j , c , toUnsignedChar(newValue) ) ;
+    		}
+    	}
+    }
+	*im = newImPtr ;
 }

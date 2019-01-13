@@ -22,3 +22,7 @@ void convertToGrayScale( Image* im ) ;
 void changeSaturation( Image* im , float percentage ) ;
 
 void verticalMirror( Image* im , int dir ) ;
+
+void vignetting( Image* im , float horizontalRadius , float verticalRadius ) ;
+
+void applyConvolution( Image** imPtrPtr , float kernel[] , int kernelSize ) ;
