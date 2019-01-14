@@ -4,6 +4,7 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <math.h>
 #define PI 3.141592653589793238462643
@@ -112,13 +113,20 @@ void verticalMirror( Image* im , int dir ){
 	}
 }
 
-void vignetting( Image* im , float horizontalRadius , float verticalRadius ){
+//Applies to x the linear function that maps the interval [a,b] into [newA,newB].
+float map( float x , float a , float b , float newA , float newB ){
+	return (x-b)*newA/(a-b) + (x-a)*newB/(b-a) ;
+}
+
+void vignetting( Image* im , float whRatio , float maxValue , float innerRadiusRatio ){
 	for( int i = 0 ; i < im->height ; ++i ){
     	for( int j = 0 ; j < im->width ; ++j ) {
-    		int dist = (int)sqrt( pow((j-im->width/2)/horizontalRadius,2) + pow((i-im->height/2)/verticalRadius,2) ) ;
-    		for( int c = 0 ; c < 3 ; ++c ){
-    			setPixel( im , i , j , c , toUnsignedChar(getPixel(im,i,j,c)-dist) ) ;
-    		}
+    		float dist = sqrt( pow((j-im->width/2),2) + pow((i-im->height/2)*whRatio,2) )  ;
+    		if( dist > innerRadiusRatio*im->width ){
+	    		for( int c = 0 ; c < 3 ; ++c ){
+	    			setPixel( im , i , j , c , toUnsignedChar(getPixel(im,i,j,c)-map(dist,innerRadiusRatio*im->width,im->width,0,maxValue)) ) ;
+	    		}
+	    	}
     	}
     }
 }

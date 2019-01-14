@@ -70,7 +70,8 @@ int main( int argc , char* argv[] ){
 			}
 		}
 		else if( strcmp( argv[k] , "VIG" ) == 0 ){
-			vignetting( im , 10 , 7 ) ;
+			vignetting( im , im->width/((float)im->height) , atof(argv[k+1]) , atof(argv[k+2]) ) ;
+			k+=3 ;
 		}
 		else if( strcmp( argv[k] , "BLUR" ) == 0 ){
 			int kernelSize = atoi(argv[++k]) ;
@@ -82,6 +83,64 @@ int main( int argc , char* argv[] ){
 			float kernel[kernelSize*kernelSize] ;
 			for( int l = 0 ; l < kernelSize*kernelSize ; ++l ){
 				kernel[l] = x ;
+			}
+			applyConvolution( &im , kernel , kernelSize ) ;
+		}
+		else if( strcmp( argv[k] , "CONvCONV" ) == 0 ){
+			int kernelSize = 3 ;
+			float x = 0.37 ;
+			float kernel[kernelSize*kernelSize] ;
+			for( int i = 0 ; i < kernelSize ; ++i ){
+				for( int j = 0 ; j < kernelSize ; ++j ){
+					if( j== 1){
+						if( i==1 ){
+							kernel[j+i*kernelSize] = 5*x ;
+						}
+						else{
+							kernel[j+i*kernelSize] = -x ;
+						}
+					}
+					else{
+						kernel[j+i*kernelSize] = 0 ;
+					}
+				}
+			}
+			applyConvolution( &im , kernel , kernelSize ) ;
+		}
+		else if( strcmp( argv[k] , "SHARPEN" ) == 0 ){
+			int kernelSize = 3 ;
+			float x = atof(argv[++k]) ;
+			float kernel[kernelSize*kernelSize] ;
+			for( int i = 0 ; i < kernelSize ; ++i ){
+				for( int j = 0 ; j < kernelSize ; ++j ){
+					if( j== 1 || i==1 ){
+						if( j==1 && i==1 ){
+							kernel[j+i*kernelSize] = 4*x+1 ;
+						}
+						else{
+							kernel[j+i*kernelSize] = -x ;
+						}
+					}
+					else{
+						kernel[j+i*kernelSize] = 0 ;
+					}
+				}
+			}
+			applyConvolution( &im , kernel , kernelSize ) ;
+		}
+		else if( strcmp( argv[k] , "EDGES" ) == 0 ){
+			int kernelSize = 3 ;
+			float x = atof(argv[++k]) ;
+			float kernel[kernelSize*kernelSize] ;
+			for( int i = 0 ; i < kernelSize ; ++i ){
+				for( int j = 0 ; j < kernelSize ; ++j ){
+					if( j== 1 && i==1 ){
+						kernel[j+i*kernelSize] = 8*x ;
+					}
+					else{
+						kernel[j+i*kernelSize] = -x ;
+					}
+				}
 			}
 			applyConvolution( &im , kernel , kernelSize ) ;
 		}

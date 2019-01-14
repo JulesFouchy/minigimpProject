@@ -23,6 +23,8 @@ void changeSaturation( Image* im , float percentage ) ;
 
 void verticalMirror( Image* im , int dir ) ;
 
-void vignetting( Image* im , float horizontalRadius , float verticalRadius ) ;
+float map( float x , float a , float b , float newA , float newB ) ;
+
+void vignetting( Image* im , float whRatio , float maxValue , float innerRadiusRatio ) ;
 
 void applyConvolution( Image** imPtrPtr , float kernel[] , int kernelSize ) ;
