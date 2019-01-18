@@ -3,15 +3,22 @@
 	#include "imageTransformations.h"
 #endif
 
+#ifndef COLOR_SPACES_H__
+	#define COLOR_SPACES_H__
+	#include "colorSpaces.h"
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 
 #include <math.h>
 #define PI 3.141592653589793238462643
 
-#define RED 0
-#define GREEN 1
-#define BLUE 2
+#ifndef COLOR_CODES__
+	#define RED 0
+	#define GREEN 1
+	#define BLUE 2
+#endif
 
 void changeLuminosity( Image* im , float param ){
 	for( int k = 0 ; k < 256 ; ++k ){
@@ -39,7 +46,7 @@ void invertColours( Image* im ){
 	}
 }
 
-//Decreases the values of the color channel, with strongest effect on intermediate values and no effect on pure black and pure white.
+//Decreases the values of the colour channel, with strongest effect on intermediate values and no effect on pure black and pure white.
 //I would suggest you go there to see the curve and play around with the coefficients : https://www.geogebra.org/classic/yfggz7nu
 //See the report for more details on the chosen function.
 void cubicMitigateColourChannel( Image* im , int colour , float coefXcube , float coefX ){
@@ -76,7 +83,7 @@ void brightenTheWhites( Image* im , float power , float factor ){
 	}
 }
 
-//Using values found here : https://en.wikipedia.org/wiki/Grayscale#Colorimetric_(perceptual_luminance-preserving)_conversion_to_grayscale
+//Using values found here : https://en.wikipedia.org/wiki/Grayscale#colourimetric_(perceptual_luminance-preserving)_conversion_to_grayscale
 void convertToGrayScale( Image* im ){
 	for( int i = 0 ; i < im->height ; ++i ){
     	for( int j = 0 ; j < im->width ; ++j ) {
@@ -161,4 +168,163 @@ void applyConvolution( Image** im , float kernel[] , int kernelSize ){
     	}
     }
 	*im = newImPtr ;
+}
+
+void blur( Image **im , int kernelSize ){
+	float x = 1.0/kernelSize/kernelSize ;
+	float kernel[kernelSize*kernelSize] ;
+	for( int l = 0 ; l < kernelSize*kernelSize ; ++l ){
+		kernel[l] = x ;
+	}
+	applyConvolution( im , kernel , kernelSize ) ;
+}
+
+void contrastViaConvolution( Image **im ){
+	int kernelSize = 3 ;
+	float x = 0.37 ;
+	float kernel[kernelSize*kernelSize] ;
+	for( int i = 0 ; i < kernelSize ; ++i ){
+		for( int j = 0 ; j < kernelSize ; ++j ){
+			if( j== 1){
+				if( i==1 ){
+					kernel[j+i*kernelSize] = 5*x ;
+				}
+				else{
+					kernel[j+i*kernelSize] = -x ;
+				}
+			}
+			else{
+				kernel[j+i*kernelSize] = 0 ;
+			}
+		}
+	}
+	applyConvolution( im , kernel , kernelSize ) ;
+}
+
+void sharpen( Image **im , float x ){
+	int kernelSize = 3 ;
+	float kernel[kernelSize*kernelSize] ;
+	for( int i = 0 ; i < kernelSize ; ++i ){
+		for( int j = 0 ; j < kernelSize ; ++j ){
+			if( j== 1 || i==1 ){
+				if( j==1 && i==1 ){
+					kernel[j+i*kernelSize] = 4*x+1 ;
+				}
+				else{
+					kernel[j+i*kernelSize] = -x ;
+				}
+			}
+			else{
+				kernel[j+i*kernelSize] = 0 ;
+			}
+		}
+	}
+	applyConvolution( im , kernel , kernelSize ) ;
+}
+
+void edges( Image **im , float x ){
+	int kernelSize = 3 ;
+	float kernel[kernelSize*kernelSize] ;
+	for( int i = 0 ; i < kernelSize ; ++i ){
+		for( int j = 0 ; j < kernelSize ; ++j ){
+			if( j== 1 && i==1 ){
+				kernel[j+i*kernelSize] = 8*x ;
+			}
+			else{
+				kernel[j+i*kernelSize] = -x ;
+			}
+		}
+	}
+	applyConvolution( im , kernel , kernelSize ) ;
+}
+
+//Algorithm found here : http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
+RGBcolour temperatureColour( float Temperature ){
+	RGBcolour colour ;
+	Temperature /= 100 ;
+
+	//Red
+	if( Temperature <= 66 ){
+        colour.R = 255 ;
+	}
+    else{
+        colour.R = Temperature - 60 ;
+        colour.R = 329.698727446 * pow(colour.R , -0.1332047592) ;
+        if( colour.R < 0 ){
+        	colour.R = 0 ;
+        }
+        if( colour.R > 255 ){
+        	colour.R = 255 ;
+        }
+    }
+
+    //Green
+    if( Temperature <= 66 ){
+        colour.G = Temperature ;
+        colour.G = 99.4708025861 * log(colour.G) - 161.1195681661 ;
+        if( colour.G < 0 ){
+        	colour.G = 0 ;
+        }
+        if( colour.G > 255 ){
+        	colour.G = 255 ;
+        }
+	}
+    else{
+        colour.G = Temperature - 60 ;
+        colour.G = 288.1221695283 * pow(colour.G , -0.0755148492) ;
+        if( colour.G < 0 ){
+        	colour.G = 0 ;
+        }
+        if( colour.G > 255 ){
+        	colour.G = 255 ;
+        }
+    }
+
+    //Blue
+    if( Temperature >= 66 ){
+        colour.B = 255 ;
+	}
+    else{
+    	if( Temperature <= 19 ){
+    		colour.B = 0 ;
+    	}
+    	else{
+	        colour.B = Temperature - 10 ;
+	        colour.B = 138.5177312231 * log(colour.B) - 305.0447927307 ;
+	        if( colour.B < 0 ){
+	        	colour.B = 0 ;
+	        }
+	        if( colour.B > 255 ){
+	        	colour.B = 255 ;
+        	}
+        }
+    }
+    return colour ;
+}
+
+void changeColourTemperature( Image *im , float temperature , float alpha ){
+	RGBcolour tempColour = temperatureColour( temperature ) ;
+	for( int i = 0 ; i < im->height ; ++i ){
+		for( int j = 0 ; j < im->width ; ++j ){
+			//Get RGB value of the pixel
+			RGBcolour pixelColour ;
+			pixelColour.R = getPixel( im , i , j , RED ) ;
+			pixelColour.G = getPixel( im , i , j , GREEN ) ;
+			pixelColour.B = getPixel( im , i , j , BLUE ) ;
+			//Save lightness
+			float V = HSVfromRGB( pixelColour ).V ;
+			//Blend pixel colour with temperatur colour
+			pixelColour.R = alpha*tempColour.R + (1-alpha)*pixelColour.R ;
+			pixelColour.G = alpha*tempColour.G + (1-alpha)*pixelColour.G ;
+			pixelColour.B = alpha*tempColour.B + (1-alpha)*pixelColour.B ;
+			//Convert to HSV, put former lightness back, and convert back to RGB
+			HSVcolour hsvColour = HSVfromRGB( pixelColour ) ;
+			hsvColour.V = V ;
+			pixelColour = RGBfromHSV( hsvColour ) ; 
+			//Set changes
+			setPixel( im , i , j , RED , toUnsignedChar(pixelColour.R) ) ;
+			setPixel( im , i , j , GREEN , toUnsignedChar(pixelColour.G) ) ;
+			setPixel( im , i , j , BLUE , toUnsignedChar(pixelColour.B) ) ;
+		}
+	}
 }

@@ -6,6 +6,12 @@
 	#include "image.h"
 #endif
 
+#ifndef COLOR_CODES__
+    #define RED 0
+    #define GREEN 1
+    #define BLUE 2
+#endif
+
 void initializeLUT( Image* im ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
@@ -39,7 +45,7 @@ Image* loadImagePPM( char path[] )
      char buff[16] ;
      Image* im ;
      FILE* file ;
-     int c, rgb_comp_color ;
+     int c, rgb_comp_colour ;
      //open PPM file for reading
      file = fopen(path, "rb");
      if (!file) {
@@ -84,13 +90,13 @@ Image* loadImagePPM( char path[] )
     im->height = height ;
 
     //read rgb component
-    if (fscanf(file, "%d", &rgb_comp_color) != 1) {
+    if (fscanf(file, "%d", &rgb_comp_colour) != 1) {
          fprintf(stderr, "Invalid rgb component (error loading '%s')\n", path);
          exit(1);
     }
 
     //check rgb component depth
-    if (rgb_comp_color!= 255) {
+    if (rgb_comp_colour!= 255) {
          fprintf(stderr, "'%s' does not have 8-bits components\n", path);
          exit(1);
     }
