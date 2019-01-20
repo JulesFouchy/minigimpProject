@@ -3,17 +3,6 @@
 
 #include "image.h"
 
- struct Image {
-    int width ;
-    int height ;
-    int luts[3][256] ;
-    int histos[3][256] ;
-    int avgHisto[256] ;
-    unsigned char pixels[] ;
-} ;
-
-
-
 #ifndef COLOR_CODES__
     #define RED 0
     #define GREEN 1
