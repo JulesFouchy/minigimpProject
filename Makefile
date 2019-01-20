@@ -16,10 +16,10 @@ CC = gcc
 CFLAGS = -Wall -O2
 
 
-minigimp: main.o image.o imageTransformations.o colorSpaces.o
+minigimp: main.o image.o imageTransformations.o colorSpaces.o histogram.o
 	$(CC) -o $@  $^ -lm
 
-main.o: main.c 
+main.o: main.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 image.o: image.c image.h
@@ -29,6 +29,9 @@ imageTransformations.o: imageTransformations.c imageTransformations.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 colorSpaces.o: colorSpaces.c  colorSpaces.h
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+histogram.o: histogram.c  histogram.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 

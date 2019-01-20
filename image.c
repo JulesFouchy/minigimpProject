@@ -10,14 +10,6 @@
     #define BLUE 2
 #endif
 
-
-struct Image {
-    int width ;
-    int height ;
-    int luts[3][256] ;
-    unsigned char pixels[] ;
-};
-
 void initializeLUT( Image* im ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
@@ -43,6 +35,18 @@ unsigned char toUnsignedChar( float x ){
 	}
 	else 
 		return x ;
+}
+
+Image* newImage( int width , int height ){
+    Image* im = malloc(sizeof(Image) + width*height*3*sizeof(unsigned char)) ;
+    if (!im) {
+         fprintf(stderr, "Unable to allocate memory\n");
+         exit(1);
+    }
+    im->width = width ;
+    im->height = height ;
+    initializeLUT( im ) ;
+    return im ;
 }
 
 //Based on a working version found here (https://stackoverflow.com/questions/2693631/read-ppm-file-and-store-it-in-an-array-coded-with-c)
@@ -87,13 +91,7 @@ Image* loadImagePPM( char path[] )
     }
 
     //alloc memory for image
-    im = malloc(sizeof(Image) + width*height*3*sizeof(unsigned char)) ;
-    if (!im) {
-         fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
-    }
-    im->width = width ;
-    im->height = height ;
+    im = newImage( width , height ) ;
 
     //read rgb component
     if (fscanf(file, "%d", &rgb_comp_colour) != 1) {
@@ -116,8 +114,7 @@ Image* loadImagePPM( char path[] )
     }
 
     fclose(file);
-
-    initializeLUT( im ) ;
+    
     return im;
 }
 

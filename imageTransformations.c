@@ -1,11 +1,9 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 
 #include "imageTransformations.h"
 
 #define PI 3.141592653589793238462643
-
 
 void changeLuminosity( Image* im , float param ){
 	for( int k = 0 ; k < 256 ; ++k ){
@@ -33,38 +31,42 @@ void invertColours( Image* im ){
 	}
 }
 
-//Decreases the values of the colour channel, with strongest effect on intermediate values and no effect on pure black and pure white.
+//Changes the values of the colour channel, with strongest effect on intermediate values and no effect on 0 and 255.
 //I would suggest you go there to see the curve and play around with the coefficients : https://www.geogebra.org/classic/yfggz7nu
 //See the report for more details on the chosen function.
-void cubicMitigateColourChannel( Image* im , int colour , float coefXcube , float coefX ){
+void cubicTransformOfColourChannel( Image* im , int colour , float coefXcube , float coefX ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		float x = im->luts[colour][k] ;
 		im->luts[colour][k] = ( coefXcube * pow(x/255,3) + coefX * x/255 ) * 255 / ( coefXcube + coefX ) ;
 	}
 }
 
-void sepia( Image* im , float redCoefXcube , float redCoefX , float greenCoefXcube , float greenCoefX , float blueCoefXcube , float blueCoefX ){
+void changeColourChannels( Image* im , float redCoefXcube , float redCoefX , float greenCoefXcube , float greenCoefX , float blueCoefXcube , float blueCoefX ){
 	convertToGrayScale( im ) ;
-	cubicMitigateColourChannel( im , RED , redCoefXcube , redCoefX ) ;
-	cubicMitigateColourChannel( im , GREEN , greenCoefXcube , greenCoefX ) ;
-	cubicMitigateColourChannel( im , BLUE  , blueCoefXcube , blueCoefX ) ;
+	cubicTransformOfColourChannel( im , RED , redCoefXcube , redCoefX ) ;
+	cubicTransformOfColourChannel( im , GREEN , greenCoefXcube , greenCoefX ) ;
+	cubicTransformOfColourChannel( im , BLUE  , blueCoefXcube , blueCoefX ) ;
 }
 
-void darkenTheBlacks( Image* im , float power , float factor ){
+//dir is 1 or -1 and indicates if we increase or decrease the blacks
+void affectOnlyBlacks( Image* im , float power , float factor , float dir ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
 			int currentValue = im->luts[c][k] ;
-			int nextValue = currentValue * (1 - exp(-factor*pow((float)currentValue/255,power) ) ) ;
+			//is is very important to check that currentValue>0 beacause the exponential function used goes wild for x<0
+			int nextValue = currentValue<0 ? currentValue : currentValue * (1 + dir*exp(-factor*pow(currentValue/255.0,power) ) ) ;
 			im->luts[c][k] = nextValue ;
 		}
 	}
 }
 
-void brightenTheWhites( Image* im , float power , float factor ){
+//dir is 1 or -1 and indicates if we increase or decrease the whites
+void affectOnlyWhites( Image* im , float power , float factor , float dir ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
 			int currentValue = im->luts[c][k] ;
-			int nextValue = currentValue * (1 + exp(-factor*pow((255-(double)currentValue)/255,power) ) ) ;
+			//is is very important to check that currentValue<255 beacause the exponential function used goes wild for x>255
+			int nextValue = currentValue>255 ? currentValue : (currentValue-255) * (1 + dir*exp(-factor*pow((255-currentValue)/255.0,power) ) ) +255 ;
 			im->luts[c][k] = nextValue ;
 		}
 	}
@@ -107,18 +109,14 @@ void verticalMirror( Image* im , int dir ){
 	}
 }
 
-//Applies to x the linear function that maps the interval [a,b] into [newA,newB].
-float map( float x , float a , float b , float newA , float newB ){
-	return (x-b)*newA/(a-b) + (x-a)*newB/(b-a) ;
-}
-
-void vignetting( Image* im , float whRatio , float maxValue , float innerRadiusRatio ){
+void vignetting( Image* im , float whRatio , float gradientSpeed , float innerRadiusRatio , float centerXratio , float centerYratio ){
 	for( int i = 0 ; i < im->height ; ++i ){
     	for( int j = 0 ; j < im->width ; ++j ) {
-    		float dist = sqrt( pow((j-im->width/2),2) + pow((i-im->height/2)*whRatio,2) )  ;
+    		//Calculate euclidian distance but with y-axis stretched by whRatio to transform circles into more general ellipses
+    		float dist = sqrt( pow((j-im->width*centerXratio),2) + pow((i-im->height*centerYratio)*whRatio,2) )  ;
     		if( dist > innerRadiusRatio*im->width ){
 	    		for( int c = 0 ; c < 3 ; ++c ){
-	    			setPixel( im , i , j , c , toUnsignedChar(getPixel(im,i,j,c)-map(dist,innerRadiusRatio*im->width,im->width,0,maxValue)) ) ;
+	    			setPixel( im , i , j , c , toUnsignedChar(getPixel(im,i,j,c) - gradientSpeed*(dist-innerRadiusRatio*im->width) ) ) ;
 	    		}
 	    	}
     	}
@@ -154,6 +152,7 @@ void applyConvolution( Image** im , float kernel[] , int kernelSize ){
     		}
     	}
     }
+    //Point towards the new image
 	*im = newImPtr ;
 }
 
@@ -165,6 +164,47 @@ void blur( Image **im , int kernelSize ){
 	}
 	applyConvolution( im , kernel , kernelSize ) ;
 }
+
+void blurEllipticGradient( Image** im , float whRatio , float gradientSpeed , float innerRadiusRatio , float centerXratio , float centerYratio ){
+	//Create the new image
+	Image* newImPtr = malloc(sizeof(Image) + ((*im)->width)*((*im)->height)*3*sizeof(unsigned char)) ;
+	newImPtr->width = (*im)->width ;
+	newImPtr->height = (*im)->height ;
+	for( int k = 0 ; k < 256 ; ++k ){
+		for( int c = 0 ; c < 3 ; ++c ){
+			newImPtr->luts[c][k] = (*im)->luts[c][k] ;
+		}
+	}
+	//Loop over the pixels
+	for( int i = 0 ; i < (*im)->height ; ++i ){
+    	for( int j = 0 ; j < (*im)->width ; ++j ) {
+    		for( int c = 0 ; c < 3 ; ++c ){
+	    		float dist = sqrt( pow((j-(*im)->width*centerXratio),2) + pow((i-(*im)->height*centerYratio)*whRatio,2) ) ;
+	    		if( dist > innerRadiusRatio * (*im)->width ){
+	    			int kernelSize = toOddInteger( gradientSpeed*( dist - innerRadiusRatio * (*im)->width ) ) ;
+	    	//Loop over the neighbours of the pixel
+	    			float newValue = 0 ;
+	    			for( int i_ = 0 ; i_ < kernelSize ; ++i_ ){
+	    				for( int j_ = 0 ; j_ < kernelSize ; ++j_ ){
+	    					int neighbourI =  i + i_ - kernelSize/2 ;
+	    					int neighbourJ =  j + j_ - kernelSize/2 ;
+	    					if( neighbourI >= 0 && neighbourI < (*im)->height && neighbourJ >= 0 && neighbourJ < (*im)->width ){
+	    						newValue += 1.0/kernelSize/kernelSize * getPixel( *im , neighbourI , neighbourJ , c ) ;
+	    					}
+	    				}
+	    			}
+	    			setPixel( newImPtr , i , j , c , toUnsignedChar(newValue) ) ;
+	    		}
+		    	else{
+		    		setPixel( newImPtr , i , j , c , getPixel( *im , i , j , c ) ) ;
+		    	}
+		    }
+    	}
+    }
+    //Point towards the new image
+    *im = newImPtr ;
+}
+
 
 void contrastViaConvolution( Image **im ){
 	int kernelSize = 3 ;
@@ -223,6 +263,12 @@ void edges( Image **im , float x ){
 		}
 	}
 	applyConvolution( im , kernel , kernelSize ) ;
+}
+
+//maps [0,2[ to 1, [2,4[ to 3 and so on
+int toOddInteger( float x ){
+	int tmp = x/2 ;
+	return 2*tmp + 1 ;
 }
 
 //Algorithm found here : http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
@@ -312,6 +358,43 @@ void changeColourTemperature( Image *im , float temperature , float alpha ){
 			setPixel( im , i , j , RED , toUnsignedChar(pixelColour.R) ) ;
 			setPixel( im , i , j , GREEN , toUnsignedChar(pixelColour.G) ) ;
 			setPixel( im , i , j , BLUE , toUnsignedChar(pixelColour.B) ) ;
+		}
+	}
+}
+
+void threshhold( Image* im , int R0 , int G0 , int B0 , int R1 , int G1 , int B1 , int threshhold ){
+	for( int i = 0 ; i < im->height ; ++i ){
+		for( int j = 0 ; j < im->width ; ++j ){
+			int grayValue =  0.2126 * getPixel( im , i , j , 0 ) + 0.7152 * getPixel( im , i , j , 1 ) + 0.0722 * getPixel( im , i , j , 2 ) ;
+			if( grayValue < threshhold ){
+				setPixel( im , i , j , 0 , R0 ) ;
+				setPixel( im , i , j , 1 , G0 ) ;
+				setPixel( im , i , j , 2 , B0 ) ;
+			}
+			else{
+				setPixel( im , i , j , 0 , R1 ) ;
+				setPixel( im , i , j , 1 , G1 ) ;
+				setPixel( im , i , j , 2 , B1 ) ;
+			}
+		}
+	}
+}
+
+void threshholdUsingMedian( Image* im , int R0 , int G0 , int B0 , int R1 , int G1 , int B1 ){
+	int median = calculateMedian( im ) ;
+	for( int i = 0 ; i < im->height ; ++i ){
+		for( int j = 0 ; j < im->width ; ++j ){
+			int grayValue =  0.2126 * getPixel( im , i , j , 0 ) + 0.7152 * getPixel( im , i , j , 1 ) + 0.0722 * getPixel( im , i , j , 2 ) ;
+			if( grayValue < median ){
+				setPixel( im , i , j , 0 , R0 ) ;
+				setPixel( im , i , j , 1 , G0 ) ;
+				setPixel( im , i , j , 2 , B0 ) ;
+			}
+			else{
+				setPixel( im , i , j , 0 , R1 ) ;
+				setPixel( im , i , j , 1 , G1 ) ;
+				setPixel( im , i , j , 2 , B1 ) ;
+			}
 		}
 	}
 }
