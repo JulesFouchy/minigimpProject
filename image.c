@@ -10,6 +10,14 @@
     #define BLUE 2
 #endif
 
+
+struct Image {
+    int width ;
+    int height ;
+    int luts[3][256] ;
+    unsigned char pixels[] ;
+};
+
 void initializeLUT( Image* im ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){

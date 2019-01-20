@@ -7,7 +7,6 @@
 #define PI 3.141592653589793238462643
 
 
-
 void changeLuminosity( Image* im , float param ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
