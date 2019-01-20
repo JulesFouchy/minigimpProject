@@ -53,8 +53,8 @@ void affectOnlyBlacks( Image* im , float power , float factor , float dir ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
 			int currentValue = im->luts[c][k] ;
-			//is is very important to check that currentValue>0 beacause the exponential function used goes wild for x<0
-			int nextValue = currentValue<0 ? currentValue : currentValue * (1 + dir*exp(-factor*pow(currentValue/255.0,power) ) ) ;
+			//is is very important to check that currentValue>0 beacause the exponential function we use goes wild for x<0
+			int nextValue = currentValue<0 ? currentValue : currentValue + currentValue*dir*exp(-factor*pow(currentValue/255.0,power) ) ;
 			im->luts[c][k] = nextValue ;
 		}
 	}
@@ -65,8 +65,8 @@ void affectOnlyWhites( Image* im , float power , float factor , float dir ){
 	for( int k = 0 ; k < 256 ; ++k ){
 		for( int c = 0 ; c < 3 ; ++c ){
 			int currentValue = im->luts[c][k] ;
-			//is is very important to check that currentValue<255 beacause the exponential function used goes wild for x>255
-			int nextValue = currentValue>255 ? currentValue : (currentValue-255) * (1 + dir*exp(-factor*pow((255-currentValue)/255.0,power) ) ) +255 ;
+			//is is very important to check that currentValue<255 beacause the exponential function we use goes wild for x>255
+			int nextValue = currentValue>255 ? currentValue : currentValue + (255-currentValue)*dir*exp(-factor*pow((255-currentValue)/255.0,power) ) ;
 			im->luts[c][k] = nextValue ;
 		}
 	}
