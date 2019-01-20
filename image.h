@@ -1,14 +1,7 @@
 #ifndef IMAGE_H__
 	#define IMAGE_H__
 
-typedef struct Image {
-    int width ;
-    int height ;
-    int luts[3][256] ;
-    int histos[3][256] ;
-    int avgHisto[256] ;
-    unsigned char pixels[] ;
-} Image;
+typedef struct Image Image ;
 
 void initializeLUT( Image* im ) ;
 

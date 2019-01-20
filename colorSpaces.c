@@ -9,6 +9,18 @@
         #define BLUE 2
     #endif
 
+struct RGBcolour {
+    float R ;
+    float G ;
+    float B ;
+};
+
+struct HSVcolour {
+    float H ;
+    float S ;
+    float V ;
+};
+
 float modulo( float x , float m ){
     while( x < 0 ){
         x+=m ;
