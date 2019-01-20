@@ -67,7 +67,6 @@ int main( int argc , char* argv[] ){
 			k+=6 ;
 		} 
 		else if( strcmp( argv[k] , "ADDBLACKS" ) == 0 ){
-			// power=1 and factor=7 seem to be decent parameters
 			if( !isNumber(argv[k+1]) || !isNumber(argv[k+2])  ){
 				printf("ERROR : ADDBLACKS expects two parameters\n");
 				return EXIT_FAILURE;
@@ -76,7 +75,6 @@ int main( int argc , char* argv[] ){
 			k+=2 ;
 		} 
 		else if( strcmp( argv[k] , "DIMBLACKS" ) == 0 ){
-			// power=1 and factor=7 seem to be decent parameters
 			if( !isNumber(argv[k+1]) || !isNumber(argv[k+2])  ){
 				printf("ERROR : DIMBLACKS expects two parameters\n");
 				return EXIT_FAILURE;
@@ -85,22 +83,21 @@ int main( int argc , char* argv[] ){
 			k+=2 ;
 		} 
 		else if( strcmp( argv[k] , "ADDWHITES" ) == 0 ){
-			// power=1 and factor=7 seem to be decent parameters
 			if( !isNumber(argv[k+1]) || !isNumber(argv[k+2])  ){
 				printf("ERROR : ADDWHITES expects two parameters\n");
 				return EXIT_FAILURE;
 			}
-			affectOnlyWhites( im , atof(argv[k+1]) , atof(argv[k+2]) , -1 ) ;
+			affectOnlyWhites( im , atof(argv[k+1]) , atof(argv[k+2]) , 1 ) ;
 			k+=2 ;
 		} else if( strcmp( argv[k] , "DIMWHITES" ) == 0 ){
-			// power=1 and factor=7 seem to be decent parameters
 			if( !isNumber(argv[k+1]) || !isNumber(argv[k+2])  ){
 				printf("ERROR : DIMWHITES expects two parameters\n");
 				return EXIT_FAILURE;
 			}
-			affectOnlyWhites( im , atof(argv[k+1]) , atof(argv[k+2]) , 1 ) ;
+			affectOnlyWhites( im , atof(argv[k+1]) , atof(argv[k+2]) , -1 ) ;
 			k+=2 ;
 		}
+		
 		/* NB : the following functions directly modify the image,
 		 * they do not make use of LUTs because they need at the same time the Red, Green and Blue information of the pixel.
 		*/
