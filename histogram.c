@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "imageTransformations.h"
+#include "histogram.h"
 
 #define PI 3.141592653589793238462643
 

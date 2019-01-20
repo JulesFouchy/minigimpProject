@@ -1,7 +1,7 @@
-#ifndef IMAGE_H__
-	#define IMAGE_H__
+#ifndef HISTOGRAM_H__
+	#define HISTOGRAM_H__
+
 	#include "image.h"
-#endif
 
 void calculateHistogram( Image *im ) ;
 
@@ -14,3 +14,5 @@ int roundfl( float x ) ;
 void saveHistogram( Image *im , int width , int height ) ;
 
 int calculateMedian( Image* im ) ;
+
+#endif
