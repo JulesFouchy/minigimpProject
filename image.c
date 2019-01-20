@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef IMAGE_H__
-	#define IMAGE_H__
-	#include "image.h"
-#endif
+#include "image.h"
+
 
 #ifndef COLOR_CODES__
     #define RED 0

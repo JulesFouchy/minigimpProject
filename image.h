@@ -1,3 +1,6 @@
+#ifndef IMAGE_H__
+	#define IMAGE_H__
+
 typedef struct Image {
 	int width ;
 	int height ;
@@ -16,3 +19,5 @@ unsigned char toUnsignedChar( float x ) ;
 Image* loadImagePPM( char path[] ) ;
 
 void saveImagePPM( char path[] , Image* im ) ;
+
+#endif

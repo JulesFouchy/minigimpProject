@@ -1,3 +1,6 @@
+#ifndef COLOR_SPACES_H__
+	#define COLOR_SPACES_H__
+
 typedef struct RGBcolour {
 	float R ;
 	float G ;
@@ -10,8 +13,13 @@ typedef struct HSVcolour {
 	float V ;
 } HSVcolour ;
 
-float modulo( float x , float m ) ;
-
 HSVcolour HSVfromRGB( RGBcolour colour ) ;
 
 RGBcolour RGBfromHSV( HSVcolour colour ) ;
+
+float modulo( float x , float m ) ;
+
+
+
+
+#endif

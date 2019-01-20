@@ -1,12 +1,17 @@
-#include "colorSpaces.h"
-
 #include <math.h>
 
-#ifndef COLOR_CODES__
-    #define RED 0
-    #define GREEN 1
-    #define BLUE 2
-#endif
+#include "colorSpaces.h"
+
+    #ifndef COLOR_CODES__
+        #define COLOR_CODES__
+        #define RED 0
+        #define GREEN 1
+        #define BLUE 2
+    #endif
+
+
+
+
 
 float modulo( float x , float m ){
     while( x < 0 ){

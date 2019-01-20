@@ -1,24 +1,12 @@
-#ifndef IMAGE_TRANSFORMATIONS_H__
-	#define IMAGE_TRANSFORMATIONS_H__
-	#include "imageTransformations.h"
-#endif
-
-#ifndef COLOR_SPACES_H__
-	#define COLOR_SPACES_H__
-	#include "colorSpaces.h"
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <math.h>
+
+#include "imageTransformations.h"
+
 #define PI 3.141592653589793238462643
 
-#ifndef COLOR_CODES__
-	#define RED 0
-	#define GREEN 1
-	#define BLUE 2
-#endif
+
 
 void changeLuminosity( Image* im , float param ){
 	for( int k = 0 ; k < 256 ; ++k ){

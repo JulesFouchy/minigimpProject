@@ -19,7 +19,7 @@ CFLAGS = -Wall -O2
 minigimp: main.o image.o imageTransformations.o colorSpaces.o
 	$(CC) -o $@  $^ -lm
 
-main.o: main.c image.h imageTransformations.h
+main.o: main.c 
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 image.o: image.c image.h

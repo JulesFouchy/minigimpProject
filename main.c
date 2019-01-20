@@ -2,15 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef IMAGE_H__
-	#define IMAGE_H__
-	#include "image.h"
-#endif
-
-#ifndef IMAGE_TRANSFORMATIONS_H__
-	#define IMAGE_TRANSFORMATIONS_H__
-	#include "imageTransformations.h"
-#endif
+#include "imageTransformations.h"
 
 int main( int argc , char* argv[] ){
 
