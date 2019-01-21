@@ -106,4 +106,6 @@ THRESH( R0 , G0 , B0 , R1 , G1 , B1 , threshhold ) :
                       should be preceded by BLUR for a nicer effect
 
 KMEANS( k ) :         finds a good representation of the image using only k colours
+                      note that since the starting points are random, the algorithm may find different representative colours each time it is applied
+                      so if you're not satisfied with the colours it picked, you may just run the algorithm again
                       
