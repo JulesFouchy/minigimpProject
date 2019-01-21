@@ -104,4 +104,6 @@ THRESH( R0 , G0 , B0 , R1 , G1 , B1 , threshhold ) :
                       threshhold should be between 0 and 255, as well as R , G and B 
                       if no threshhold is specified, the function will calculate a threshhold with half of the pixels below it, and the other half above
                       should be preceded by BLUR for a nicer effect
+
+KMEANS( k ) :         finds a good representation of the image using only k colours
                       
