@@ -154,7 +154,7 @@ void saveImagePPM( char path[] , Image* im )
 
 
 // My version, which was almost working :
-/*Image* loadImagePPM( char path[] ){
+/*Image* loadImagePPM2( char path[] ){
     FILE* file = fopen( path , "r"); // read only
     if( file == NULL ){
       printf("Opening image failed !");   
@@ -176,7 +176,6 @@ void saveImagePPM( char path[] , Image* im )
     im->height = height ;
     for( int k = 0 ; k < width*height*3 ; ++k ){
         fscanf(file, "%c", &im->pixels[k]) ;
-        printf("%d\n",im->pixels[k] );
     }
 
     fclose(file) ;
@@ -184,7 +183,7 @@ void saveImagePPM( char path[] , Image* im )
     return im ;
 }
 
-void saveImagePPM( char path[] , Image* im ){
+void saveImagePPM2( char path[] , Image* im ){
     FILE* file ;
     if ( ! (file = fopen(path,"w")) ){
        printf("Saving image failed !") ;

@@ -9,8 +9,6 @@
         #define BLUE 2
     #endif
 
-
-
 float modulo( float x , float m ){
     while( x < 0 ){
         x+=m ;
