@@ -17,6 +17,17 @@ void initializeLUT( Image* im ){
 	}
 }
 
+void applyLUT( Image* im ){
+    for( int i = 0 ; i < im->height ; ++i ){
+        for( int j = 0 ; j < im->width ; ++j ){
+            for( int c = 0 ; c < 3 ; ++c ){
+                setPixel( im , i , j , c , toUnsignedChar(im->luts[c][getPixel(im,i,j,c)]) ) ;
+            }
+        }
+    }
+    initializeLUT( im ) ;
+}
+
 unsigned char getPixel( Image* im , int i , int j , int c ){
 	return im->pixels[ im->width*3*i + 3*j + c ] ;
 }
@@ -141,8 +152,8 @@ void saveImagePPM( char path[] , Image* im )
     for( int i = 0 ; i < im->height ; ++i ){
     	for( int j = 0 ; j < im->width ; ++j ) {
     		for( int c = 0 ; c < 3 ; ++c ){
-    			unsigned char newPixelValue = toUnsignedChar(im->luts[c][getPixel(im,i,j,c)]) ;
-    			fwrite( &newPixelValue , 1 , 1 , file) ;
+                unsigned char pixelValue = getPixel(im,i,j,c) ;
+    			fwrite( &pixelValue , 1 , 1 , file) ;
     		}
     	}
     }

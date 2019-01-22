@@ -12,6 +12,8 @@ typedef struct Image {
 
 void initializeLUT( Image* im ) ;
 
+void applyLUT( Image* im ) ;
+
 unsigned char getPixel( Image* im , int i , int j , int colour ) ;
 
 void setPixel( Image* im , int i , int j , int c , unsigned char value) ;
