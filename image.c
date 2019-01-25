@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "image.h"
 
@@ -51,7 +52,7 @@ Image* newImage( int width , int height ){
     Image* im = malloc(sizeof(Image) + width*height*3*sizeof(unsigned char)) ;
     if (!im) {
          fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
+         exit(100);
     }
     im->width = width ;
     im->height = height ;
@@ -70,19 +71,19 @@ Image* loadImagePPM( char path[] )
      file = fopen(path, "rb");
      if (!file) {
           fprintf(stderr, "Unable to open file '%s'\n", path);
-          exit(1);
+          exit(101);
      }
 
      //read image format
      if (!fgets(buff, sizeof(buff), file)) {
           perror(path);
-          exit(1);
+          exit(102);
      }
 
     //check the image format
     if (buff[0] != 'P' || buff[1] != '6') {
          fprintf(stderr, "Invalid image format (must be 'P6')\n");
-         exit(1);
+         exit(103);
     }
 
     //check for comments
@@ -97,7 +98,7 @@ Image* loadImagePPM( char path[] )
     int width, height ;
     if (fscanf(file, "%d %d", &width, &height) != 2) {
          fprintf(stderr, "Invalid image size (error loading '%s')\n", path);
-         exit(1);
+         exit(104);
     }
 
     //alloc memory for image
@@ -106,13 +107,13 @@ Image* loadImagePPM( char path[] )
     //read rgb component
     if (fscanf(file, "%d", &rgb_comp_colour) != 1) {
          fprintf(stderr, "Invalid rgb component (error loading '%s')\n", path);
-         exit(1);
+         exit(105);
     }
 
     //check rgb component depth
     if (rgb_comp_colour!= 255) {
          fprintf(stderr, "'%s' does not have 8-bits components\n", path);
-         exit(1);
+         exit(106);
     }
 
     while (fgetc(file) != '\n') ;
@@ -120,7 +121,7 @@ Image* loadImagePPM( char path[] )
     //read pixel data from file
     if (fread(im->pixels, 3 * im->width, im->height, file) != im->height) {
          fprintf(stderr, "Error loading image '%s'\n", path);
-         exit(1);
+         exit(107);
     }
 
     fclose(file);
@@ -130,9 +131,47 @@ Image* loadImagePPM( char path[] )
 
 void saveImagePPM( char path[] , Image* im )
 {
+    if (strrchr(path, '/') != NULL) {
+        path = strrchr(path, '/');
+        path = path + 1;
+    }
+   
+
+    if (strlen(path) > 53) {
+        printf("Le nom du fichier fourni est trop long, merci de le réduire à 50 caractère maximum\n");
+        exit(301);
+    }
+
+    char name[strlen(path)-4];
+    for (int i = 0; path[i] != '.'; i++) {
+        name[i] = path[i];
+        name[i+1] = '\0';
+    }
+
+
+    char *newName = malloc((strlen(name)+strlen("_result.ppm"))*sizeof(char));
+    strcpy(newName,name);
+    char str[50];
+
+    for(int i=2; fopen(strcat(newName, "_result.ppm"),"r") != NULL; i++) {
+        printf("%s\n", newName);
+        free(newName);
+
+        sprintf(str, "%d", i);
+
+        char *newName = malloc((strlen(name)+strlen(str)+strlen("_result.ppm"))*sizeof(char));
+        printf("%s\n", newName);
+
+        strcpy(newName,name);
+        printf("%s\n", newName);
+        strcat(newName,str);
+        printf("%s\n", newName);
+    }
+
+    printf("%s\n", newName);
     FILE* file;
     //open file for output
-    file = fopen(path, "wb");
+    file = fopen(newName, "wb");
     if (!file) {
          fprintf(stderr, "Unable to open file '%s'\n", path);
          exit(1);
@@ -159,6 +198,7 @@ void saveImagePPM( char path[] , Image* im )
     }
 
     fclose(file);
+    free(newName);
 }
 
 

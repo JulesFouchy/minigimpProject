@@ -1,7 +1,8 @@
-#include "k-means.h"
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
+
+#include "k-means.h"
 
 float distanceSq( RGBcolour rgb , float R , float G , float B ){
 	return pow(rgb.R-R,2) + pow(rgb.G-G,2) + pow(rgb.B-B,2) ;

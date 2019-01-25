@@ -19,22 +19,22 @@ CFLAGS = -Wall -O2
 minigimp: main.o image.o imageTransformations.o colorSpaces.o histogram.o k-means.o
 	$(CC) -o $@  $^ -lm
 
-main.o: main.c
+main.o: main.c imageTransformations.h image.h colorSpaces.h histogram.h k-means.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 image.o: image.c image.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-imageTransformations.o: imageTransformations.c imageTransformations.h
+imageTransformations.o: imageTransformations.c imageTransformations.h image.h colorSpaces.h histogram.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 colorSpaces.o: colorSpaces.c  colorSpaces.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-histogram.o: histogram.c  histogram.h
+histogram.o: histogram.c  histogram.h image.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-k-means.o: k-means.c  k-means.h
+k-means.o: k-means.c k-means.h image.h colorSpaces.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 

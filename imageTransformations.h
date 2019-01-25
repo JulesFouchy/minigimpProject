@@ -12,8 +12,6 @@
 		#define BLUE 2
 	#endif
 
-
-
 void changeLuminosity( Image* im , float param ) ;
 
 void changeContrast( Image* im , float param ) ;
