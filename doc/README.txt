@@ -6,7 +6,7 @@ Example commands that are worth checking out :
 
 Documentation : 
 
--histo :              option that can be called to save the histogram of the final image
+-histo :              option that can be called to save the histogram of the image with all the effects called before -histo
 
 ADDLUM( x ) :         increases luminosity
                       x should be between 0 (no modification) and 255 (fully white image)
