@@ -25,4 +25,4 @@ bin/k-means.o: src/k-means.c src/k-means.h src/image.h src/colorSpaces.h
 
 
 clean:
-	rm -rf *.o
+	rm -rf bin/*.o

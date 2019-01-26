@@ -149,8 +149,9 @@ void saveImagePPM( char path[] , Image* im )
     }
 
 
-    char *newName = malloc((strlen(name)+strlen("_result.ppm"))*sizeof(char));
-    strcpy(newName,name);
+    char *newName = malloc((strlen("images/")+strlen(name)+strlen("_result.ppm"))*sizeof(char));
+    strcpy(newName,"images/");
+    strcat(newName,name);
     char str[50];
 
     for(int i=2; fopen(strcat(newName, "_result.ppm"),"r") != NULL; i++) {
@@ -158,9 +159,9 @@ void saveImagePPM( char path[] , Image* im )
 
         sprintf(str, "%d", i);
 
-        char *newName = malloc((strlen(name)+strlen(str)+strlen("_result.ppm"))*sizeof(char));
-
-        strcpy(newName,name);
+        char *newName = malloc((strlen("images/")+strlen(name)+strlen(str)+strlen("_result.ppm"))*sizeof(char));
+        strcpy(newName,"images/");
+        strcat(newName,name);
         strcat(newName,str);
     }
 
@@ -169,7 +170,7 @@ void saveImagePPM( char path[] , Image* im )
     file = fopen(newName, "wb");
     if (!file) {
          fprintf(stderr, "Unable to open file '%s'\n", path);
-         exit(1);
+         exit(302);
     }
 
     //write the header file
