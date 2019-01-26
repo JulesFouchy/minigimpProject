@@ -70,7 +70,7 @@ MIRROR( direction ) : direction can be RIGHT : copies a mirror image of the righ
 VIG( gradientSpeed , unaffectedPart'sRadiusRatio , center'sXcoordinateRatio , center'sYcoordinateRatio ) :
 
                       adds vignetting
-                      gradientSpeed = 0.3 is a reasonable parameter
+                      gradientSpeed = 0.03 is a reasonable parameter
                       the three last parameters are expressed as percentages of the image's width and heigth
                       they should be between 0 and 1
 
